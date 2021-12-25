@@ -1,7 +1,7 @@
 // @ts-nocheck
 import dayjs from 'dayjs';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { useQuery } from 'react-query';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from 'react-query';
 
 import { axiosInstance } from '../../../axiosInstance';
 import { queryKeys } from '../../../react-query/constants';
@@ -64,6 +64,16 @@ export function useAppointments(): UseAppointments {
   /** ****************** END 2: filter appointments  ******************** */
   /** ****************** START 3: useQuery  ***************************** */
   // useQuery call for appointments for the current monthYear
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const nextMonth = getNewMonthYear(monthYear, 1);
+    queryClient.prefetchQuery(
+      [queryKeys.appointments, nextMonth.year, nextMonth.month],
+      () => getAppointments(nextMonth.year, nextMonth.month),
+    );
+  }, [monthYear, queryClient]);
 
   // TODO: update with useQuery!
   // Notes:
